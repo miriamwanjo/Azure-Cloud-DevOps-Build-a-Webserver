@@ -3,13 +3,13 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "var.prefix-resources"
+  name     = "${var.prefix}-resources-group"
   location = var.location
   tags     = var.tags
 }
 
 resource "azurerm_virtual_network" "main" {
-  name                = "var.prefix-network"
+  name                = "${var.prefix}-network"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
@@ -17,7 +17,7 @@ resource "azurerm_virtual_network" "main" {
 }
 
 resource "azurerm_subnet" "internal" {
-  name                 = "var.prefix-subnet"
+  name                 = "${var.prefix}-subnet"
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.2.0/24"]
@@ -30,15 +30,17 @@ resource "azurerm_loadbalancer" "main" {
 }
 
 resource "azurerm_public_ip" "main" {
-  name                = var.prefix-PublicIPaddress"
+  name                = ${var.prefix}-PublicIPaddress"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-  tags                = var.tags
+  tags = {
+   tags = var.tags
+   }
 }
 
 resource "azurerm_lb" "main" {
-  name                = "var.prefix-mainLB"
+  name                = "${var.prefix}-mainLB"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -46,7 +48,9 @@ resource "azurerm_lb" "main" {
     name                 = "loadbalancerFrontEnd"
     public_ip_address_id = azurerm_public_ip.main.id
   }
-  tags                 = var.tags
+  tags = {
+   tags = var.tags
+   }
 }
 
 resource "azurerm_lb_backend_address_pool" "main" {
@@ -76,7 +80,7 @@ resource "azurerm_lb_rule" "main" {
 }
 
 resource "azurerm_network_interface" "main" {
-  name                = "var.prefix-nic"
+  name                = "${var.prefix}-nic"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 
@@ -85,7 +89,9 @@ resource "azurerm_network_interface" "main" {
     subnet_id                     = azurerm_subnet.internal.id
     private_ip_address_allocation = "Dynamic"
   }
-  tags                = var.tags
+  tags = {
+   tags = var.tags
+   }
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "main" {
@@ -105,7 +111,7 @@ data "azurerm_image" "image" {
 }
 
 resource "azurerm_linux_virtual_machine" "main" {
-  name                            = "var.prefix-vm"
+  name                            = "${var.prefix}-vm"
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
   size                            = "Standard_D2s_v3"
@@ -153,5 +159,7 @@ resource "azurerm_linux_virtual_machine" "main" {
     }
   }
 
-  tags = vars.tags
+  tags = {
+   tags = var.tags
+   }
 }
