@@ -1,20 +1,20 @@
 variable "prefix" {
   description = "The prefix which should be used for all resources in this example"
-  default      = "mw-udacity-webserver"
+  default      = "mw-udacity-webserver2"
 }
 
 variable "location" {
   default = "East US"
 }
 
-variable "username" {
+variable "admin_username" {
   description = "Default username for admin"
   default = "adminuser"
 }
 
-variable "password" {
+variable "admin_password" {
   description = "Default password for admin"
-  default = ""
+  default = "MWwebserver2021"
 }
 
 variable "vm_count" {
@@ -23,12 +23,12 @@ variable "vm_count" {
 }
 
 variable "tags" {
-  description = "A map of the tags to use for the resources that are deployed"
+  description = "Tags to set for all resources"
   type        = map(string)
-  default = {
-    name = "mw-udacity-vmserver-project"
-    }
+  default     = {
+    environment = "MW-Udacity-vm-project"
   }
+}
 
 variable "application_port" {
   description = "port to expose the load balancer"
