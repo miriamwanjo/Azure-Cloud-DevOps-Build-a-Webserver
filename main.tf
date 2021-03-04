@@ -3,9 +3,41 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "${var.prefix}-resources-group"
+  name     = "${var.prefix}-resources"
   location = var.location
-  tags     = var.tags
+  tags = var.tags
+}
+
+resource "azurerm_network_security_group" "main" {
+  name                = "${var.prefix}-nsg"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "deny-Inbound"
+    priority                   = 800
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule{
+    name                        = "allow-Outbound"
+    priority                    = 850
+    direction                   = "Outbound"
+    access                      = "Allow"
+    protocol                    = "*"
+    source_port_range           = "*"
+    destination_port_range      = "*"
+    source_address_prefix       = "VirtualNetwork"
+    destination_address_prefix  = "*"
+  }
+
+  tags = var.tags
 }
 
 resource "azurerm_virtual_network" "main" {
@@ -13,7 +45,7 @@ resource "azurerm_virtual_network" "main" {
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  tags     = var.tags
+  tags  = var.tags
 }
 
 resource "azurerm_subnet" "internal" {
@@ -24,19 +56,12 @@ resource "azurerm_subnet" "internal" {
 }
 
 
-resource "azurerm_loadbalancer" "main" {
-  name     = "LoadBalancerRG"
-  location = azurerm_resource_group.main.location
-}
-
 resource "azurerm_public_ip" "main" {
-  name                = ${var.prefix}-PublicIPaddress"
+  name                = "${var.prefix}-PublicIPaddress"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-  tags = {
-   tags = var.tags
-   }
+  tags = var.tags
 }
 
 resource "azurerm_lb" "main" {
@@ -48,13 +73,10 @@ resource "azurerm_lb" "main" {
     name                 = "loadbalancerFrontEnd"
     public_ip_address_id = azurerm_public_ip.main.id
   }
-  tags = {
-   tags = var.tags
-   }
+  tags = var.tags
 }
 
 resource "azurerm_lb_backend_address_pool" "main" {
-  resource_group_name = azurerm_resource_group.main.name
   loadbalancer_id     = azurerm_lb.main.id
   name                = "lbbackendpool"
 }
@@ -80,26 +102,26 @@ resource "azurerm_lb_rule" "main" {
 }
 
 resource "azurerm_network_interface" "main" {
-  name                = "${var.prefix}-nic"
+  count = var.vm_count
+  name                = "${var.prefix}-nic${count.index}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 
   ip_configuration {
-    name                          = "internal"
+    name                          = "testconfiguration${count.index}"
     subnet_id                     = azurerm_subnet.internal.id
     private_ip_address_allocation = "Dynamic"
   }
-  tags = {
-   tags = var.tags
-   }
+  tags = var.tags
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "main" {
   count = var.vm_count
   network_interface_id    = azurerm_network_interface.main[count.index].id
-  ip_configuration_name   = azurerm_subnet.internal.name #"internal"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.main[count.index].id}"
+  ip_configuration_name   = "testconfiguration${count.index}"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
+
 
 data "azurerm_resource_group" "image" {
   name = "packer-project-rg"
@@ -115,8 +137,12 @@ resource "azurerm_linux_virtual_machine" "main" {
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
   size                            = "Standard_D2s_v3"
+  admin_username                  = var.admin_username
+  admin_password                  = var.admin_password
+  disable_password_authentication = false
+  count = var.vm_count
   network_interface_ids = [
-    azurerm_network_interface.main.id,
+    azurerm_network_interface.main[count.index].id,
   ]
 
   source_image_reference {
@@ -126,40 +152,11 @@ resource "azurerm_linux_virtual_machine" "main" {
     version   = "latest"
   }
 
-  os_profile {
-    computer_name_prefix = "vm_server"
-    admin_username       = var.username
-    admin_password       = var.password
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-      path     = "/home/azureuser/.ssh/authorized_keys"
-      key_data = file("~/.ssh/id_rsa.pub")
-    }
-  }
-
   os_disk {
     name                 = "myosdisk"
-    managed_disk_type    = "Standard_LRS"
+    storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
-    create_option        = "FromImage"
   }
 
-  network_profile {
-    name    = "terraformnetworkprofile"
-    primary = true
-
-    ip_configuration {
-      name                                   = "IPConfiguration"
-      subnet_id                              = azurerm_subnet.main.id
-      load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.main.id]
-      primary = true
-    }
-  }
-
-  tags = {
-   tags = var.tags
-   }
+  tags = var.tags
 }
