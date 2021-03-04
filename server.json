@@ -8,10 +8,10 @@
 	"builders": [{
 		"type": "azure-arm",
 
-		"client_id": "8ee9a364-8385-426c-9731-4b1efb837aa1",
-		"client_secret": "FtZ.Kez70iN-dU0658dHZLD-ch9ic5erKp",
-		"subscription_id": "2dd1a95b-ae56-42b5-a752-e81591e9ec9a",
-		"tenant_id": "79870084-7776-455d-b32d-139736b75db6",
+		"client_id": "",
+		"client_secret": "",
+		"subscription_id": "",
+		"tenant_id": "",
 
 		"os_type": "Linux",
 		"image_publisher": "Canonical",
