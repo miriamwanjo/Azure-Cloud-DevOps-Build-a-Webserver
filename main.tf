@@ -124,11 +124,11 @@ resource "azurerm_network_interface_backend_address_pool_association" "main" {
 
 
 data "azurerm_resource_group" "image" {
-  name = "PACKER-PROJECT-RG"
+  name = "mwpackerImage"
 }
 
 data "azurerm_image" "image" {
-  name                = "myPackerImage"
+  name                = "server"
   resource_group_name = data.azurerm_resource_group.image.name
 }
 
