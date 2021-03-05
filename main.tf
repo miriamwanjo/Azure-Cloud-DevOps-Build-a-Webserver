@@ -124,7 +124,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "main" {
 
 
 data "azurerm_resource_group" "image" {
-  name = "packer-project-rg"
+  name = "PACKER-PROJECT-RG"
 }
 
 data "azurerm_image" "image" {
@@ -133,7 +133,7 @@ data "azurerm_image" "image" {
 }
 
 resource "azurerm_linux_virtual_machine" "main" {
-  name                            = "${var.prefix}-vm"
+  name                            = "${var.prefix}-linux-vm"
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
   size                            = "Standard_D2s_v3"
@@ -153,7 +153,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
   os_disk {
-    name                 = "myosdisk"
+    name                 = "udacitymyosdisk101"
     storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
   }
