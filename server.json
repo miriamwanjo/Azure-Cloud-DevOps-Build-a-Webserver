@@ -18,8 +18,8 @@
 		"image_offer": "UbuntuServer",
 		"image_sku": "18.04-LTS",
 
-		"managed_image_resource_group_name": "packer-project-rg",
-		"managed_image_name": "myPackerImage",
+		"managed_image_resource_group_name": "mwpackerImage",
+		"managed_image_name": "server",
 
 		"azure_tags": {
 				"Name": "MW-Udacity-vm-project"
