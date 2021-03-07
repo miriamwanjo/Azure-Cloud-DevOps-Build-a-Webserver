@@ -57,3 +57,10 @@ The following resources will be built:
 8. Main Resource group
 9. Public IP address
 10. Subnet
+
+- To get any of the output variables, define the output variable in the output.tf file.
+- run terraform refresh and the output variable should be displayed:
+
+Outputs:
+location = "eastus"
+main_public_ip = "52.188.130.207"
