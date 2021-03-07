@@ -40,9 +40,20 @@ For this project, you will write a Packer template and a Terraform template to d
     - Then initialize Terraform: terraform init
     - then run terraform plan -out solution.plan to save the flag with the name solution.plan
     - Run terraform apply solution.plan to deploy your terraform Infrastructure
-    
+    - Once complete, run terraform show to view and inspect the state of your infrastructure    
 5. Destroy all the Resources  
     - Destroy all the resources built by Terraform using terraform Destroy
     - Destroy the Packer image by running: az image delete -g packer-rg -n packer_image_name
 ### Output
-**Your words here**
+The following resources will be built:
+
+1. Main Load balancer with a front end IP configuration
+2. Backend address pool.
+3. 2 Lb health probes
+4. Load balancer security rules
+5. 2 virtual virtual Machines
+6. 2 Network Interface cards
+7. Security Group with Inbound and Outbound security rules
+8. Main Resource group
+9. Public IP address
+10. Subnet
