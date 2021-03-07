@@ -61,6 +61,7 @@ resource "azurerm_public_ip" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
+  sku                 = "Standard"
   tags = var.tags
 }
 
@@ -68,6 +69,7 @@ resource "azurerm_lb" "main" {
   name                = "${var.prefix}-mainLB"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  sku                 = "Standard"
 
   frontend_ip_configuration {
     name                 = "loadbalancerFrontEnd"
@@ -99,6 +101,7 @@ resource "azurerm_lb_rule" "main" {
   frontend_ip_configuration_name = "loadbalancerFrontEnd"
   backend_address_pool_id        = azurerm_lb_backend_address_pool.main.id
   probe_id                       = azurerm_lb_probe.main.id
+
 }
 
 resource "azurerm_network_interface" "main" {
@@ -133,7 +136,7 @@ data "azurerm_image" "image" {
 }
 
 resource "azurerm_linux_virtual_machine" "main" {
-  name                            = "${var.prefix}-linux-vm"
+  name                            = "${var.prefix}-vm${count.index+1}"
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
   size                            = "Standard_D2s_v3"
@@ -153,7 +156,6 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
   os_disk {
-    name                 = "udacitymyosdisk101"
     storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
   }
