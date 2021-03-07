@@ -1,3 +1,4 @@
+![topology](https://user-images.githubusercontent.com/41089682/110250560-7fe13700-7f41-11eb-8f01-9f81ee7e8ebd.PNG)
 # Azure Infrastructure Operations Project: Deploying a scalable IaaS web server in Azure
 
 ### Introduction
