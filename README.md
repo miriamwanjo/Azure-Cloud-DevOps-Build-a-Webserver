@@ -28,7 +28,14 @@ For this project, you will write a Packer template and a Terraform template to d
     - Create a service principal to create the packer image - give a contributor role to your service principal.
       run: az ad sp create-for-rbac --name name --role="Contributor" --scopes="/subscriptions/$subcriptionId" --output json
       *if you are unsure of your subscription_id simply run az account list --output table
-    - The command above will output the environment variables which you can simply use to fill out the client_id, client_secret, subscription_id, tenant_id on the server.json file.
+    - The command above will output the environment variables which you will export and save in a ~/.bashrc file. Export and save the appid(client_id), password (client_secret), subscription_id, tenant_id to the file.
+    - To extend the ~/.bashrc file, run nano ~/.bashrc file.
+    - fill out and save the environment variables: example:
+          export ARM_TENANT_ID=###############################
+          export ARM_SUBSCRIPTION_ID=########################
+          export ARM_CLIENT_ID=############################
+          export ARM_CLIENT_SECRET=######################
+    - run source ~/.bashrc to source the file and then env to check if the environment variables are set.
 
 3. Create a terraform template that contains information on how to create and deploy the infrastructure.
     - Ensure that the resource group you specified in the Packer image is the same image in terraform
